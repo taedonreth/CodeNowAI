@@ -18,7 +18,7 @@ app = FastAPI()
 # Allow frontend to interact with backend (CORS setup)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Update with your frontend URL (e.g., http://localhost:3000)
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -93,5 +93,43 @@ def chat(request: ChatRequest):
     except Exception as e:
         return {"error": str(e)}
 
+@app.post("/chat_resume")
+def chat_resume():
+    try:
+        # Read the project details from tic-tac-toe.json
+        with open("backend/repos/tic-tac-toe.json", "r") as f:
+            project_details = json.load(f)
 
+        system_prompt = """You are a professional resume writer. When given project details, create:
+1. A tech stack list
+2. Three strong resume bullet points that:
+   - Start with different action verbs (e.g., developed, implemented, optimized)
+   - Include metrics when possible
+   - Show impact
+   - Are maximum 120 characters each
+Format the response exactly as:
+Tech Stack: [technologies]
+Resume Bullet Points:
+- [bullet 1]
+- [bullet 2]
+- [bullet 3]"""
+
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            system=system_prompt,
+            messages=[
+                {"role": "user", "content": str(project_details)}
+            ]
+        )
+
+        return {"response": response.content}
+
+    except FileNotFoundError:
+        return {"error": "tic-tac-toe.json file not found"}
+    except json.JSONDecodeError:
+        return {"error": "Invalid JSON format in tic-tac-toe.json"}
+    except Exception as e:
+        return {"error": str(e)}
+    
 # Run the app using: uvicorn main:app --reload
