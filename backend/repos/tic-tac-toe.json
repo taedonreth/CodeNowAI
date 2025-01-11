@@ -1,0 +1,38 @@
+{
+    "repo_name": "Tic Tac Toe Game",
+    "description": "Build a simple Tic Tac Toe game using pure JavaScript, HTML, and CSS.",
+    "keywords": ["tic tac toe", "javascript", "beginner", "html", "css", "game development"],
+    "steps": [
+      {
+        "step_number": 1,
+        "instruction": "Set up the project structure by creating three files: `index.html`, `style.css`, and `script.js`. These will hold the HTML structure, CSS styling, and JavaScript logic for the game. Ensure all files are in the same directory and linked together in the HTML file. Add placeholders for a title, a game board (3x3 grid), a status display for the game state, and a restart button. Use the `link` tag in the `<head>` section to include the CSS file and the `script` tag at the bottom of the `<body>` to include the JavaScript file.",
+        "code_snippet": null
+      },
+      {
+        "step_number": 2,
+        "instruction": "Write the basic HTML structure for the game in the `index.html` file. Create a `<section>` element for the main game container. Inside the section, include:\n1. A `<h1>` element for the game title.\n2. A `<div>` with the class `game--container` to represent the game board. Inside this `div`, add 9 smaller `<div>` elements with the class `cell` to represent the 3x3 grid. Each cell should also include a `data-cell-index` attribute numbered from 0 to 8 for identifying the cells.\n3. A `<h2>` element with the class `game--status` to display messages about the current player's turn, the winner, or a draw.\n4. A `<button>` element with the class `game--restart` for resetting the game.",
+        "code_snippet": "<!doctype html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Tic Tac Toe</title>\n    <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n    <section>\n        <h1 class=\"game--title\">Tic Tac Toe</h1>\n        <div class=\"game--container\">\n            <div data-cell-index=\"0\" class=\"cell\"></div>\n            <div data-cell-index=\"1\" class=\"cell\"></div>\n            <div data-cell-index=\"2\" class=\"cell\"></div>\n            <div data-cell-index=\"3\" class=\"cell\"></div>\n            <div data-cell-index=\"4\" class=\"cell\"></div>\n            <div data-cell-index=\"5\" class=\"cell\"></div>\n            <div data-cell-index=\"6\" class=\"cell\"></div>\n            <div data-cell-index=\"7\" class=\"cell\"></div>\n            <div data-cell-index=\"8\" class=\"cell\"></div>\n        </div>\n        <h2 class=\"game--status\"></h2>\n        <button class=\"game--restart\">Restart Game</button>\n    </section>\n<script src=\"script.js\"></script>\n</body>\n</html>"
+      },
+      {
+        "step_number": 3,
+        "instruction": "Style the game board and elements in the `style.css` file. Use CSS grid to create a 3x3 grid layout for the `game--container`. Style each `cell` to be square with borders, a cursor pointer, and centered text. Use a font size large enough for clarity and spacing around the board for a clean design. Ensure the title, status message, and button are styled for readability.",
+        "code_snippet": "body {\n    font-family: \"Arial\", sans-serif;\n}\nsection {\n    text-align: center;\n}\n.game--container {\n    display: grid;\n    grid-template-columns: repeat(3, auto);\n    width: 306px;\n    margin: 50px auto;\n}\n.cell {\n    font-family: \"Permanent Marker\", cursive;\n    width: 100px;\n    height: 100px;\n    border: 1px solid #333333;\n    cursor: pointer;\n    line-height: 100px;\n    font-size: 60px;\n}"
+      },
+      {
+        "step_number": 4,
+        "instruction": "Initialize the game variables in `script.js`. Use JavaScript to:\n1. Select the `game--status` element for displaying messages.\n2. Define a `gameActive` variable to track whether the game is ongoing.\n3. Set a `currentPlayer` variable to track whose turn it is (X or O).\n4. Create an array `gameState` with 9 empty strings to represent the board state.\nAdd messages to inform players whose turn it is, and define helper functions like `winningMessage`, `drawMessage`, and `currentPlayerTurn` to format messages.",
+        "code_snippet": "const statusDisplay = document.querySelector('.game--status');\nlet gameActive = true;\nlet currentPlayer = \"X\";\nlet gameState = [\"\", \"\", \"\", \"\", \"\", \"\", \"\", \"\", \"\"];\nconst winningMessage = () => `Player ${currentPlayer} has won!`;\nconst drawMessage = () => `Game ended in a draw!`;\nconst currentPlayerTurn = () => `It's ${currentPlayer}'s turn`;\nstatusDisplay.innerHTML = currentPlayerTurn();"
+      },
+      {
+        "step_number": 5,
+        "instruction": "Write the logic for handling cell clicks. When a cell is clicked:\n1. Get the `data-cell-index` attribute of the clicked cell.\n2. Check if the cell has already been clicked or if the game is inactive. If either is true, ignore the click.\n3. Update the `gameState` and the UI to reflect the move.\n4. Validate the game state to check for a winner or draw after each move.",
+        "code_snippet": "function handleCellClick(clickedCellEvent) {\n    const clickedCell = clickedCellEvent.target;\n    const clickedCellIndex = parseInt(clickedCell.getAttribute('data-cell-index'));\n    if (gameState[clickedCellIndex] !== \"\" || !gameActive) {\n        return;\n    }\n    handleCellPlayed(clickedCell, clickedCellIndex);\n    handleResultValidation();\n}"
+      },
+      {
+        "step_number": 6,
+        "instruction": "Add the logic for validating the game result in the `handleResultValidation` function. Use the provided `winningConditions` array to check if any row, column, or diagonal contains the same player. If all cells are filled without a winner, declare a draw.",
+        "code_snippet": "const winningConditions = [\n    [0, 1, 2], [3, 4, 5], [6, 7, 8],\n    [0, 3, 6], [1, 4, 7], [2, 5, 8],\n    [0, 4, 8], [2, 4, 6]\n];\nfunction handleResultValidation() {\n    let roundWon = false;\n    for (let i = 0; i <= 7; i++) {\n        const winCondition = winningConditions[i];\n        let a = gameState[winCondition[0]];\n        let b = gameState[winCondition[1]];\n        let c = gameState[winCondition[2]];\n        if (a === '' || b === '' || c === '') {\n            continue;\n        }\n        if (a === b && b === c) {\n            roundWon = true;\n            break;\n        }\n    }\n    if (roundWon) {\n        statusDisplay.innerHTML = winningMessage();\n        gameActive = false;\n        return;\n    }\n    let roundDraw = !gameState.includes(\"\");\n    if (roundDraw) {\n        statusDisplay.innerHTML = drawMessage();\n        gameActive = false;\n        return;\n    }\n    handlePlayerChange();\n}"
+      }
+    ]
+  }
+  
